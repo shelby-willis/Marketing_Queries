@@ -1,0 +1,44 @@
+##--UPDATE for most recent year: Average job length
+with
+
+jobsites AS (
+  SELECT 
+jobid,
+dateopened,
+statusupdatedbydate AS dateclosed,
+--actualstart,
+--actualcompletion
+FROM btdatascience.btreporting_dimension.jobsites j
+LEFT JOIN btdatascience.btreporting_dimension.builders b
+  ON b.builderid = j.builderid
+WHERE  b.isDemoAccount = FALSE
+  AND j.isSampleJob = FALSE
+  AND j.Template <> 2
+  AND j.jobstatus != 2
+),
+
+Yoy AS(
+SELECT
+  jobid,
+  dateopened,
+  dateclosed,
+  --actualstart,
+  --actualcompletion,
+  CASE
+    WHEN DATE_DIFF(CURRENT_DATE(), dateclosed, YEAR) = 0 THEN 'THIS YEAR'
+    WHEN DATE_DIFF(CURRENT_DATE(), dateclosed, YEAR) = 1 THEN 'LAST YEAR'
+    WHEN DATE_DIFF(CURRENT_DATE(), dateclosed, YEAR) = 2 THEN 'YEAR BEFORE LAST YEAR'
+    else 'other'
+    END AS Date_Category
+FROM jobsites
+WHERE dateclosed IS NOT NULL
+)
+
+SELECT 
+Date_category,
+  AVG(DATE_DIFF(dateclosed, dateopened,  DAY))
+  --AVG(DATE_DIFF(actualcompletion, actualstart,  DAY))
+FROM YoY
+GROUP BY date_category
+--you can open a job and the schud could not start until next month 
+--there is a grey area of how long the job can remain open
