@@ -1,0 +1,30 @@
+##--payment revenue
+
+with
+
+PAYMENTS AS (
+  SELECT
+amount,
+transactionId,
+buildertrendFee,
+CASE
+    WHEN DATE_DIFF(CURRENT_DATE(), CAST(transacdate AS DATE), YEAR) = 0 THEN '2023'
+    WHEN DATE_DIFF(CURRENT_DATE(), CAST(transacdate AS DATE), YEAR) = 1 THEN '2022'
+    WHEN DATE_DIFF(CURRENT_DATE(), CAST(transacdate AS DATE), YEAR) = 2 THEN '2021'
+        WHEN DATE_DIFF(CURRENT_DATE(), CAST(transacdate AS DATE), YEAR) = 0 THEN '2020'
+    WHEN DATE_DIFF(CURRENT_DATE(), CAST(transacdate AS DATE), YEAR) = 1 THEN '2019'
+    WHEN DATE_DIFF(CURRENT_DATE(), CAST(transacdate AS DATE), YEAR) = 2 THEN '2018'
+    else 'other'
+    END AS Date_Category
+
+FROM btdatascience.output.newpsmack_all_payments
+)
+
+SELECT
+SUM(amount) + SUM(buildertrendFee) AS payment,
+SUM(amount) AS Amount,
+SUM(buildertrendFee) AS BTFee,
+Date_Category
+
+FROM PAYMENTS
+GROUP BY Date_Category
