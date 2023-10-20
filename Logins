@@ -1,0 +1,8 @@
+##--UPDATE for most recent year: Buildertrend log ins (internal users)
+SELECT 
+    COUNT(DISTINCT uniqueid) 
+FROM `btdatascience.btreporting_dimension.signins` 
+WHERE 
+    (loginstamp BETWEEN CAST('2022-01-01' AS DATE) AND CAST('2022-12-31' AS DATE)) --16,212,858
+  --SUBS LOGINS: GLOBAL USERS HOMEOWNER/SUBCONTRACTER
+  
