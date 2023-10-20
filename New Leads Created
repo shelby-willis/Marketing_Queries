@@ -1,0 +1,8 @@
+##---UPDATE for most recent year: New leads created
+
+SELECT 
+    COUNT( distinct leadid) 
+FROM `btdatascience.btreporting_dimension.leads` 
+WHERE 
+    (dateadded BETWEEN ('2022-01-01') AND ('2022-12-31'))  
+    
