@@ -1,0 +1,19 @@
+##--payments proccessed
+with
+
+MACK AS (
+  SELECT DISTINCT
+transactionId,
+amount,
+buildertrendFee,
+transacdate
+
+FROM btdatascience.output.newpsmack_all_payments
+)
+
+SELECT
+  COUNT( distinct transactionId) AS TransacId,
+FROM MACK
+WHERE 
+(transacdate BETWEEN ('2022-01-01') AND ('2022-12-31'))
+
