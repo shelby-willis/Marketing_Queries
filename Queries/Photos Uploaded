@@ -1,0 +1,19 @@
+##--UPDATE for most recent year: Photos uploaded
+
+with
+
+PHOTOS AS (
+  SELECT
+documentinstanceid,
+dateattached,
+title
+FROM `btdatascience.btreporting_dimension.documentinstances` 
+)
+
+SELECT
+  COUNT(distinct documentinstanceid) AS documentinstanceid
+FROM PHOTOS
+WHERE 
+(dateattached BETWEEN ('2022-01-01') AND ('2022-12-31'))
+AND  ((title LIKE '%%.jpg') 
+OR (title LIKE '%%.png') )
