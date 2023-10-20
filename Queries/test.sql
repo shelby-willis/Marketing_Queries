@@ -39,5 +39,4 @@ SELECT
 Date_category,
 COUNT(DISTINCT jobid) AS job_count
 FROM YoY
-GROUP BY date_category
-
+GROUP BY Date_category
