@@ -1,0 +1,7 @@
+##--time clock punches ALL TIME PUNCHES not just clock ins
+SELECT 
+  COUNT(DISTINCT timecarditemid) AS timecarditemid 
+  --,COUNT(clockedinbyid) As clockinid
+FROM `btdatascience.btreporting_dimension.timecarditems`
+WHERE 
+    (clockedinbydate BETWEEN ('2022-01-01') AND ('2022-12-31'))
