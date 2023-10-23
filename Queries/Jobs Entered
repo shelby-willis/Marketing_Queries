@@ -1,0 +1,29 @@
+#--JOBS ENTERED
+with
+jobsites AS(
+  SELECT
+  CASE
+    WHEN DATE_DIFF(CURRENT_DATE(), dateopened, YEAR) = 0 THEN 'THIS YEAR'
+    WHEN DATE_DIFF(CURRENT_DATE(), dateopened, YEAR) = 1 THEN 'LAST YEAR'
+    WHEN DATE_DIFF(CURRENT_DATE(), dateopened, YEAR) = 2 THEN 'YEAR BEFORE LAST YEAR'
+    else 'other'
+    END AS Date_Category,
+    jobid
+
+FROM btdatascience.btreporting_dimension.jobsites j
+LEFT JOIN btdatascience.btreporting_dimension.builders b
+  ON b.builderid = j.builderid
+WHERE  b.isDemoAccount = FALSE
+  AND j.isSampleJob = FALSE
+  AND j.Template <> 2
+  AND j.jobstatus != 2
+)
+
+SELECT 
+Date_category,
+COUNT(DISTINCT jobid)
+FROM jobsites
+GROUP BY date_category
+
+--2022: LAST YEAR 1,353,709
+--2021: YEAR BEFORE LAST YEAR 1,298,670
