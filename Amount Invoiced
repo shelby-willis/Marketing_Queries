@@ -1,0 +1,10 @@
+##--CUSTOMER INVOICES
+SELECT 
+  --SUM(totalwithtax) AS totalwithtax,
+  (SUM(amount)+ SUM(taxamount)) AS amountwithtax
+FROM `btdatascience.btreporting_dimension.customerinvoices` 
+WHERE 
+  voidedbyid IS NULL
+  AND (paiddate BETWEEN CAST('2022-01-01' AS DATE) AND CAST('2022-12-31' AS DATE))
+  --JUST LOOKING AT HOW MUCH HAS BEEN RELEASED OUT FOR CUSTOMER TO PAY
+  AND releasedbydate is not null
