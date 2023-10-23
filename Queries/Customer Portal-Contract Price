@@ -1,0 +1,52 @@
+##----Builders saw a __% higher contract price using the Customer Portal
+with
+
+customer_portal_builders AS (
+SELECT 
+  j.builderid
+FROM btdatascience.btreporting_dimension.jobsites j
+LEFT JOIN btdatascience.btreporting_dimension.builders b
+  ON b.builderid = j.builderid
+WHERE  b.isDemoAccount = FALSE
+  AND j.isSampleJob = FALSE
+  AND j.Template <> 2
+  AND j.jobstatus != 2
+  AND actualcompletion BETWEEN CAST('2022-01-01' AS DATE) AND CAST('2022-12-31' AS DATE)
+  AND actconfirmed IS NOT NULL
+),
+
+
+contract_price_NCP AS (--without customer portal
+SELECT 
+AVG(startingprice) AS non_cp_price,
+
+FROM btdatascience.btreporting_dimension.jobsites j
+LEFT JOIN btdatascience.btreporting_dimension.builders b
+  ON b.builderid = j.builderid
+WHERE  b.isDemoAccount = FALSE
+  AND j.isSampleJob = FALSE
+  AND j.Template <> 2
+  AND j.jobstatus != 2
+  AND actualcompletion BETWEEN CAST('2022-01-01' AS DATE) AND CAST('2022-12-31' AS DATE)
+AND j.builderid NOT IN (SELECT * FROM customer_portal_builders)
+),
+
+contract_price_CP AS ( --with customer portal
+SELECT 
+AVG(startingprice) AS cp_avg_price,
+
+FROM btdatascience.btreporting_dimension.jobsites j
+LEFT JOIN btdatascience.btreporting_dimension.builders b
+  ON b.builderid = j.builderid
+WHERE  b.isDemoAccount = FALSE
+  AND j.isSampleJob = FALSE
+  AND j.Template <> 2
+  AND j.jobstatus != 2
+  AND actualcompletion BETWEEN CAST('2022-01-01' AS DATE) AND CAST('2022-12-31' AS DATE)
+AND j.builderid IN (SELECT * FROM customer_portal_builders)
+)
+
+SELECT *
+FROM
+contract_price_CP -- AVG $101,751.69
+--contract_price_NCP -- AVG $30,602.88
