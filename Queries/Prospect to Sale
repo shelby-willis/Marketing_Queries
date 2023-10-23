@@ -1,0 +1,24 @@
+##--With Buildertrend's CRM, prospects become sales in just __ days
+
+with
+
+LEADS AS (
+  SELECT DISTINCT
+    dateadded AS leadopened,
+    solddate,
+    --convertedtojobdate COMPARE
+    leadid
+  FROM `btdatascience.btreporting_dimension.leads` 
+    WHERE (dateadded BETWEEN ('2022-01-01') AND ('2022-12-31'))
+    AND solddate IS NOT NULL
+)
+
+,CRM AS (
+  SELECT
+    DATE_DIFF(solddate, leadopened, DAY) as lead_sale,
+  FROM LEADS
+ )
+
+ SELECT 
+  AVG(lead_sale)
+  FROM CRM
