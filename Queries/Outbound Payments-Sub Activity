@@ -1,0 +1,47 @@
+##-- think what they are probably trying to show is that when a builder uses outbound payments, 
+--how often is their subcontractor active within the buildertrend sub portal
+
+WITH
+
+
+outbound_payments AS (
+  SELECT 
+    b.builderid
+  FROM `btdatascience.btreporting_dimension.builders` b 
+  JOIN btdatascience.dataiku_views.checkbookConnected cc on b.builderid = cc.builderid 
+  WHERE 
+    b.isdemoaccount = FALSE
+    AND cc.onboardingCompleteDate IS NOT NULL
+    AND cc.initialconnectiondate IS NOT NULL
+),
+
+sub_portal AS (
+  SELECT
+    COUNT(DISTINCT s.id) as subsigns,
+    j.builderid,
+    COUNT( DISTINCT userid) AS subid
+  FROM btdatascience.builder_analytics.signins_subs s
+  LEFT JOIN btdatascience.btreporting_dimension.jobsites j
+    ON s.builderid = j.builderid
+  LEFT JOIN btdatascience.btreporting_dimension.builders b
+    ON b.builderid = j.builderid
+  WHERE  b.isDemoAccount = FALSE
+    AND j.isSampleJob = FALSE
+    AND j.Template <> 2
+    AND actualcompletion BETWEEN CAST('2022-01-01' AS DATE) AND CAST('2022-12-31' AS DATE)
+    AND actconfirmed IS NOT NULL
+  GROUP BY 2
+)
+
+  SELECT
+    AVG(s.subsigns) AS SUB_signins,
+    AVG(subid) AS SUB_ids,
+  FROM sub_portal s
+  WHERE s.builderid
+    NOT
+      IN (SELECT o.builderid FROM outbound_payments o)
+
+
+--not in outbound: 68.45 signins
+--in outbound: 72.6 signins
+--new-old/old*100
