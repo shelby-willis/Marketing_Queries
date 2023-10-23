@@ -1,0 +1,26 @@
+##--Builders using Buildertrend's CRM features have on avg _ new leads per month
+
+with
+
+LEADS AS (
+  SELECT DISTINCT
+    CASE 
+      WHEN leadid IS NULL THEN 0 ELSE 1
+    END leads_created,
+    EXTRACT(MONTH FROM dateadded) AS month,
+    dateadded,
+    builderid
+  FROM `btdatascience.btreporting_dimension.leads` 
+    WHERE 
+    --leadstatus = 0 and
+    (dateadded BETWEEN ('2022-01-01') AND ('2022-12-31'))
+)
+
+--,CRM AS (
+  SELECT
+    SUM(leads_created)/COUNT(DISTINCT builderid) as avg_leads_created,
+    month
+  FROM LEADS
+  GROUP BY 2
+  ORDER BY avg_leads_created desc
+--)
