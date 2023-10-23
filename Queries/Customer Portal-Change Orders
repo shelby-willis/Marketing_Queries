@@ -1,0 +1,43 @@
+##--Change orders approved _ days faster by clients with the Customer Portal
+
+--for the customer portal you can just look at the actConfirmed column in the jobsites table which will let you know if the portal has been activated for that job or not. 
+
+--for the login box you'll want to grab the qCompletion_LoginBox column from the BuilderGettingStarted table. 
+with
+
+customer_portal_builders AS (
+SELECT 
+  J.builderid
+FROM btdatascience.btreporting_dimension.jobsites j
+LEFT JOIN btdatascience.btreporting_dimension.builders b
+  ON b.builderid = j.builderid
+WHERE  b.isDemoAccount = FALSE
+  AND j.isSampleJob = FALSE
+  AND j.Template <> 2
+  AND j.jobstatus != 2
+  AND statusupdatedbydate BETWEEN CAST('2022-01-01' AS DATE) AND CAST('2022-12-31' AS DATE)
+  AND actconfirmed IS NOT NULL
+),
+
+--approval status by homeowner through the portal 
+--
+customer_portal AS (SELECT
+AVG(DATE_DIFF(approvalupdated, dateentered, DAY)) AS AVG_Approved_CO_CP
+FROM btdatascience.btreporting_dimension.changeorders
+WHERE (dateentered BETWEEN ('2022-01-01') AND ('2022-12-31'))
+AND builderid IN (select * from customer_portal_builders)
+AND approvalstatus = 3
+),
+
+no_cp AS (SELECT
+AVG(DATE_DIFF(approvalupdated, dateentered, DAY)) AS AVG_Approved_CO_NOCP
+FROM btdatascience.btreporting_dimension.changeorders
+WHERE (dateentered BETWEEN ('2022-01-01') AND ('2022-12-31'))
+AND builderid NOT IN (select * from customer_portal_builders)
+AND approvalstatus = 3
+)
+
+
+SELECT * FROM 
+--no_cp --2022: 17.81
+customer_portal --2022: 15.58
